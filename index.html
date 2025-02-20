@@ -102,7 +102,7 @@
 
     <h2>Avaliação de Projetos Científicos</h2>
 
-    <form id="formAvaliacao" action="https://api.sheetmonkey.io/form/pjHXBzUd6eKMKQcGUujWxo" method="post" onsubmit="exibirMensagem()">
+    <form id="formAvaliacao" action="https://api.sheetmonkey.io/form/pjHXBzUd6eKMKQcGUujWxo" method="post">
 
         <label>Nome do Avaliador:</label>
         <input type="text" name="Nome do Avaliador" required />
@@ -116,43 +116,50 @@
         <label>Título do Projeto:</label>
         <input type="text" name="Título do Projeto" required />
 
+<p class="orientacoes">
+            <strong>ORIENTAÇÕES:</strong><br>
+
+            Por gentileza, solicitamos o preenchimento de todos os campos com as devidas justificativas. <br>
+            Para atribuir a nota em cada critério, arraste a "bola" azul, utilizando apenas notas inteiras entre 0 e 100.
+        </p>
+
         <!-- Critérios de Avaliação -->
-        <label>Mérito, originalidade e relevância do projeto para o desenvolvimento científico, tecnológico e de inovação do Estado do Paraná e do País. (Peso3)</label>
+        <label>1- Mérito, originalidade e relevância do projeto. (Peso3)</label>
         <div class="slider-container">
             <input type="range" name="Mérito e relevância" min="0" max="100" step="1" value="0" oninput="atualizarValor(this, 'valorMerito')" />
             <span class="slider-value" id="valorMerito">0</span>
         </div>
         <textarea name="Observação Mérito" placeholder="Justifique sua avaliação"></textarea>
 
-        <label>Coerência e adequação do problema de pesquisa aos objetivos, metodologia e resultados esperados no projeto de pesquisa. (Peso 2)</label>
+        <label>2- Coerência e adequação do problema de pesquisa. (Peso2)</label>
         <div class="slider-container">
             <input type="range" name="Coerência do problema" min="0" max="100" step="1" value="0" oninput="atualizarValor(this, 'valorCoerencia')" />
             <span class="slider-value" id="valorCoerencia">0</span>
         </div>
         <textarea name="Observação Coerência" placeholder="Justifique sua avaliação"></textarea>
 
-        <label>Coerência e adequação do cronograma de atividades com os resultados esperados do projeto de pesquisa. (Peso 2)</label>
+        <label>3- Coerência e adequação do cronograma. (Peso2)</label>
         <div class="slider-container">
             <input type="range" name="Adequação do cronograma" min="0" max="100" step="1" value="0" oninput="atualizarValor(this, 'valorCronograma')" />
             <span class="slider-value" id="valorCronograma">0</span>
         </div>
         <textarea name="Observação Cronograma" placeholder="Justifique sua avaliação"></textarea>
 
-        <label>Aderência do projeto de pesquisa proposto a um ou mais temas (Domínios e Subdomínios) do Paraná 2040 – Rotas Estratégicas de Ciência, Tecnologia & Inovação (CT&I), Ecossistema Norte Pioneiro. (Peso1)</label>
+        <label>4- Aderência do projeto ao Paraná 2040. (Peso1)</label>
         <div class="slider-container">
             <input type="range" name="Aderência Paraná 2040" min="0" max="100" step="1" value="0" oninput="atualizarValor(this, 'valorAderencia')" />
             <span class="slider-value" id="valorAderencia">0</span>
         </div>
         <textarea name="Observação Aderência" placeholder="Justifique sua avaliação"></textarea>
 
-        <label>Coerência e adequação entre a experiência da equipe do projeto e os objetivos, atividades e metas propostos. (Peso1)</label>
+        <label>5- Coerência e adequação da equipe do projeto. (Peso1)</label>
         <div class="slider-container">
             <input type="range" name="Experiência da equipe" min="0" max="100" step="1" value="0" oninput="atualizarValor(this, 'valorExperiencia')" />
             <span class="slider-value" id="valorExperiencia">0</span>
         </div>
         <textarea name="Observação Experiência" placeholder="Justifique sua avaliação"></textarea>
 
-        <label>Plano para Promoção, Popularização e Divulgação Científica e Tecnológica: (Peso1)</label>
+        <label>6- Plano de Promoção e Divulgação Científica. (Peso1)</label>
         <div class="slider-container">
             <input type="range" name="Divulgação Científica" min="0" max="100" step="1" value="0" oninput="atualizarValor(this, 'valorDivulgacao')" />
             <span class="slider-value" id="valorDivulgacao">0</span>
@@ -160,14 +167,47 @@
         <textarea name="Observação Divulgação" placeholder="Justifique sua avaliação"></textarea>
 
         <input type="hidden" name="Created" value="x-sheetmonkey-current-date-time" />
-
         <button type="submit">Enviar Avaliação</button>
-
+        <p id="mensagem">✅ Resposta enviada com sucesso!</p>
     </form>
 
-    <p id="mensagem">✅ Resposta enviada com sucesso!</p>
-
     <script>
+        document.getElementById("formAvaliacao").addEventListener("submit", function(event) {
+            let campos = [
+                { nome: "Mérito e relevância", id: "valorMerito", obs: "Observação Mérito" },
+                { nome: "Coerência do problema", id: "valorCoerencia", obs: "Observação Coerência" },
+                { nome: "Adequação do cronograma", id: "valorCronograma", obs: "Observação Cronograma" },
+                { nome: "Aderência Paraná 2040", id: "valorAderencia", obs: "Observação Aderência" },
+                { nome: "Experiência da equipe", id: "valorExperiencia", obs: "Observação Experiência" },
+                { nome: "Divulgação Científica", id: "valorDivulgacao", obs: "Observação Divulgação" }
+            ];
+
+            let erro = false;
+            let mensagemErro = "Responda o campo em branco:\n\n";
+
+            campos.forEach(campo => {
+                let slider = document.querySelector(`input[name="${campo.nome}"]`);
+                let observacao = document.querySelector(`textarea[name="${campo.obs}"]`);
+
+                if (slider.value == "0") {
+                    erro = true;
+                    mensagemErro += `- Ajuste a nota do critério: ${campo.nome}\n`;
+                }
+
+                if (observacao.value.trim() === "") {
+                    erro = true;
+                    mensagemErro += `- Preencha a observação de: ${campo.nome}\n`;
+                }
+            });
+
+            if (erro) {
+                alert(mensagemErro);
+                event.preventDefault();
+            } else {
+                exibirMensagem();
+            }
+        });
+
         function exibirMensagem() {
             document.getElementById("mensagem").style.display = "block";
         }
